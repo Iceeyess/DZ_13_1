@@ -21,7 +21,7 @@ class Category:
     @classmethod
     @property
     def goods(cls):
-        return [prod for prod in cls.__goods]
+        return cls.__goods
 
     @classmethod
     def add_product(cls, product):
