@@ -12,7 +12,7 @@ for key in json_file:
     value = dict()
     if isinstance(key['products'], list):
         for product_keys in key['products']:
-            product_instance_list.append(Product.add_product(product_keys['name'], product_keys['description'], product_keys['price'], product_keys['quantity']))
+            Product.add_product(product_keys['name'], product_keys['description'], product_keys['price'], product_keys['quantity'])
     category_instance_list.append(Category(key['name'], key['description']))
 print(category_instance_list)
-print(product_instance_list)
+print(Category.goods)

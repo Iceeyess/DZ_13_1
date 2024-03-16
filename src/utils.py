@@ -26,7 +26,7 @@ class Category:
     @classmethod
     def add_product(cls, product):
         """Метод добавляет экземпляр класса в список Category.__goods"""
-        Category.__goods.append(product)
+        cls.__goods.append(product)
 
 
 class Product:
@@ -59,5 +59,5 @@ class Product:
                 category_.__dict__['price'] = max(category_.__dict__['price'], new_product.price)
                 return new_product
         Category.total_unique_product += 1
-        return new_product
+        Category.add_product(new_product)
 
