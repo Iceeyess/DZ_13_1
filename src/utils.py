@@ -2,11 +2,11 @@ class Category:
     """Класс для характеристики и действий над категориями товаров"""
     name: str
     description: str
-    goods: list
+    __goods: list
     total_category_count: int  # общее количество категории
     total_unique_product: int  # общее количество уникальный товаров
 
-    goods = list()
+    __goods = list()
     total_category_count = 0
     total_unique_product = 0
 
@@ -17,6 +17,16 @@ class Category:
 
     def __repr__(self):
         return f"{self.name}"
+
+    @classmethod
+    @property
+    def goods(cls):
+        return [prod for prod in cls.__goods]
+
+    @classmethod
+    def add_product(cls, product):
+        """Метод добавляет экземпляр класса в список Category.__goods"""
+        Category.__goods.append(product)
 
 
 class Product:
@@ -31,19 +41,23 @@ class Product:
         self.description = description
         self.price = price
         self.remaining_quantity = quantity
-        if self.verify_product_instance(): # Только если не ЭК в списке Category.goods идет добавление
-            Category.total_unique_product += 1
-            Category.goods.append(self)
 
     def verify_product_instance(self):
-        """Метод для определения, есть ли данный ЭК в списке Category.goods."""
-        flag = True  # Переменная с булевым значением, чтобы понять, есть ли данный ЭК в Category.goods или нет.
-        for category_ in Category.goods:
-            if self.name in category_.__dict__.values():
-                flag = False
-                return flag
-        return flag
+        """Метод для определения, есть ли данный ЭК в списке Category.__goods."""
 
     def __repr__(self):
-        return f"{self.name}"
+        """Хранит в списках шаблон по заданию 13.2 - Задача 2"""
+        return f"{self.name}, {self.price} руб. Остаток: {self.remaining_quantity} шт."
+
+    @classmethod
+    def add_product(cls, name, description, price, quantity):
+        """Возвращает новый товар по 13.2 - задание 3 и 3*, если такого нет, иначе изменяет остатки и цену"""
+        new_product = cls(name, description, price, quantity)
+        for category_ in Category.goods:
+            if new_product.name in category_.__dict__.values():
+                category_.__dict__['remaining_quantity'] += new_product.remaining_quantity
+                category_.__dict__['price'] = max(category_.__dict__['price'], new_product.price)
+                return new_product
+        Category.total_unique_product += 1
+        return new_product
 
