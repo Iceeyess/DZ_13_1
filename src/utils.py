@@ -21,7 +21,7 @@ class Category:
     @classmethod
     @property
     def goods(cls):
-        return [prod for prod in cls.__goods]
+        return cls.__goods
 
     @classmethod
     def add_product(cls, product):
@@ -33,13 +33,13 @@ class Product:
     """Класс для характеристик и действий над свойствами товаров"""
     name: str
     description: str
-    price: float
+    __price: float
     remaining_quantity: int
 
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.remaining_quantity = quantity
 
     def verify_product_instance(self):
@@ -49,14 +49,38 @@ class Product:
         """Хранит в списках шаблон по заданию 13.2 - Задача 2"""
         return f"{self.name}, {self.price} руб. Остаток: {self.remaining_quantity} шт."
 
+    def __str__(self):
+        """Для корректного отображения в диалоговом окне для пользователя в методе price.setter"""
+        return f"{self.name}, {self.price} руб. Остаток: {self.remaining_quantity} шт."
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, old_new_instances):
+        old_value, new_value = old_new_instances
+        if new_value.price <= 0:
+            print(f"Введена некорректная цена. Проверьте цену.")
+        else:
+            if old_value.price > new_value.price:
+                print('Данные уже введенного продукта: ', old_value)
+                print('Данные нового продукта: ', new_value)
+                feedback = input(f"Вы уверены, что хотите понизить цену?\n (Введите 'y', если да, 'n' если нет.\n").lower()
+                if feedback == 'y':
+                    self.__price = new_value.price
+                else:
+                    self.__price = old_value.price
+            else:
+                self.__price = new_value.price
+
     @classmethod
     def add_product(cls, name, description, price, quantity):
         """Возвращает новый товар по 13.2 - задание 3 и 3*, если такого нет, иначе изменяет остатки и цену"""
         new_product = cls(name, description, price, quantity)
         for category_ in Category.goods:
             if new_product.name in category_.__dict__.values():
+                category_.price = (category_, new_product)
                 category_.__dict__['remaining_quantity'] += new_product.remaining_quantity
-                category_.__dict__['price'] = max(category_.__dict__['price'], new_product.price)
                 return new_product
         Category.total_unique_product += 1
         Category.add_product(new_product)
